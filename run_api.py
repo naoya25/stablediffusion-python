@@ -64,8 +64,6 @@ def generate_image(data: PromptData):
     )
 
     if response.status_code == 200:
-        print(response.json())
-
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         output_dir = os.path.join("./outputs", timestamp)
 
@@ -75,6 +73,13 @@ def generate_image(data: PromptData):
         image_path = os.path.join(output_dir, f"image.{data.output_format}")
         with open(image_path, "wb") as file:
             file.write(response.content)
+
+        # レスポンスヘッダー情報を保存
+        headers_path = os.path.join(output_dir, "response_headers.json")
+        with open(headers_path, "w", encoding="utf-8") as file:
+            # dictに変換して保存
+            headers_dict = dict(response.headers)
+            json.dump(headers_dict, file, ensure_ascii=False, indent=4)
 
         # プロンプトなどのデータを保存
         data_path = os.path.join(output_dir, "data.json")
@@ -92,7 +97,7 @@ def generate_image(data: PromptData):
 def main():
     try:
         data = PromptData(
-            prompt="(masterpiece,best quality:1.4),(8k,raw photo,photo realistic:1.2),shiny skin,detailed skin,detailed face,detailed eyes,1 Japanese girl, baby face, Emphasize the cleavage, Swayback stance, maid cosplay, nsfw, standing pose, in hotel room",
+            prompt="1 girl, in a maid outfit, in a hotel room, standing pose",
             aspect_ratio=ASPECT.R9_16,
         )
         generate_image(data)
